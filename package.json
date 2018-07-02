@@ -1,0 +1,36 @@
+{
+  "name": "currency-converter",
+  "version": "1.0.0",
+  "description": "Currency Converter is a web application that help users convert one currency to another.",
+  "main": "index.js",
+  "scripts": {
+    "build": "babel app/js -d app/dist/js",
+    "clean": "rm -r app/dist && mkdir app/dist",
+    "clean-build": "npm run clean && npm run build",
+    "lint": "eslint ./ || true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clintonpi/currency-converter.git"
+  },
+  "keywords": [
+    "currency",
+    "converter",
+    "currency",
+    "converter",
+    "convert"
+  ],
+  "author": "Clinton Nkwocha",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/clintonpi/currency-converter/issues"
+  },
+  "homepage": "https://github.com/clintonpi/currency-converter#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "eslint": "^5.0.1",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.13.0"
+  }
+}
