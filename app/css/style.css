@@ -1,21 +1,24 @@
 :root {
-  --font: 'Fredoka One', cursive;
-  --dark: #2f3542;
-  --bright: #ecf0f1;
+  --font: 'Signika', sans-serif;
+  --primary: #40739e;
+  --secondary: #535c68;
+  --major: #ffffff;
 }
 
 body {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font);
   font-size: 16px;
   text-align: center;
-  background-color: var(--bright);
-  color: var(--dark);
+  background-color: var(--major);
+  color: var(--primary);
   min-width: 260px;
 }
 
 header {
   display: flex;
-  box-shadow: 0px 0px 5px var(--dark);
+  background-color: var(--primary);
+  color: var(--major);
+  box-shadow: 0px 0px 5px var(--primary);
   justify-content: center;
   padding: 10px;
 }
@@ -30,7 +33,13 @@ header img {
 }
 
 h1 {
-  font-size: 4rem;
+  font-size: 3rem;
+}
+
+#toggle {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
 }
 
 section {
@@ -48,32 +57,139 @@ h2 {
   font-size: 1.3rem;
 }
 
-select, input {
-  width: 100%;
-  border: none;
-  background-color: var(--bright);
-  color: var(--dark);
-  border-bottom: 2px solid var(--dark);
-  margin-bottom: 20px;
-  padding: 10px;
-  font-family: 'Fredoka One', cursive;
+label {
+  color: var(--secondary);
 }
 
-input[type="submit"] {
-  border: 2px solid var(--dark);
+select, input, .button {
+  width: 100%;
+  border: none;
+  background-color: var(--major);
+  color: var(--secondary);
+  border-bottom: 2px solid var(--primary);
+  margin-bottom: 20px;
+  padding: 10px;
+  font-family: var(--font);
+  font-size: 1rem;
+}
+
+select {
+  -webkit-appearance: none; 
+  -moz-appearance: none;
+  appearance: none;
+  background: url("../images/select-icon.png") no-repeat 98% center;
+}
+
+.button {
+  width: 30%;
+  display: block;
+  margin: 20px auto 0;
+  border: 2px solid var(--primary);
   border-radius: 10px;
 }
 
-input[type="submit"]:hover {
-  background-color: var(--dark);
-  color: var(--bright);
+.button:hover {
+  background-color: var(--primary);
+  color: var(--major);
   cursor: pointer;
+}
+
+.overlay {
+  width: 100%;
+  min-height: 100vh;
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  background-color: rgba(0, 0, 0, .7);
+  display: none;
+}
+
+#loader {
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+  margin: auto;
+  line-height: 100px;
+  border: 10px solid var(--primary);
+  border-top: 10px solid var(--secondary);
+  animation: load 1s infinite linear;
+}
+
+@keyframes load {
+  from {transform: rotate(0deg)}
+  to {transform: rotate(360deg)}
+}
+
+#message {
+  background-color: var(--major);
+  height: auto;
+  margin: auto;
+  padding: 20px 10px;
+  border-radius: 10px;
+}
+
+#message *:not(.button) {
+  margin: 5px;
+}
+
+#message p {
+  font-size: 1.2rem;
+}
+
+#notification {
+  background-color: var(--secondary);
+  color: white;
+  width: 250px;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  z-index: 1;
+  display: none;
+  animation: wiggle 10s infinite;
+}
+
+@keyframes wiggle {
+  1% {transform: rotate(5deg);}
+  2% {transform: rotate(-10deg);}
+  3% {transform: rotate(10deg);}
+  4% {transform: rotate(-10deg);}
+  5% {transform: rotate(10deg);}
+  6% {transform: rotate(-10deg);}
+  7% {transform: rotate(10deg);}
+  8% {transform: rotate(-10deg);}
+  9% {transform: rotate(10deg);}
+  10% {transform: rotate(0deg);}
+} 
+
+.notif-btns {
+  display: inline-block;
+  width: 100px;
+}
+
+footer {
+  position: absolute;
+  top: calc(100% - 62px);
+  width: 100%;
+  padding: 10px 0;
+}
+
+footer a {
+  color: var(--primary);
+  outline: none;
+}
+
+footer a:hover {
+  color: var(--secondary);
+  text-decoration: underline;
 }
 
 @media (max-width: 800px) {
   
   h1 {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
 
   header img {
@@ -86,7 +202,15 @@ input[type="submit"]:hover {
   }
 
   h2 {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+  }
+
+}
+
+@media (max-height: 600px) {
+
+  footer {
+    position: static;
   }
 
 }

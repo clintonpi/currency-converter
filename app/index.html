@@ -6,10 +6,10 @@
     <meta name="description" content="Currency Converter is a web application that help users convert one currency to another.">
     <meta name="keywords" content="currency converter, currency, converter, convert">
     <meta name="language" content="English">
-    <meta name="theme-color" content="#ecf0f1">
+    <meta name="theme-color" content="#ffffff">
     <meta name="viewport" content="width=device-width">
-    <title>Currency Converter | Convert from one currency to another</title>
-    <link href="https://fonts.googleapis.com/css?family=Fredoka+One" rel="stylesheet">
+    <title>Currency Converter | Convert one currency to another</title>
+    <link href="https://fonts.googleapis.com/css?family=Signika" rel="stylesheet">
     <link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="./css/reset.min.css" type="text/css">
     <link rel="stylesheet" href="./css/style.css" type="text/css">
@@ -17,31 +17,51 @@
   <body>
     <div id="container">
       <header>
-        <img src="./images/cc.png" alt="currency-converter-logo">
         <h1>Currency Converter</h1>
       </header>
       <section>
-        <h2>Convert from one currency to another</h2>
+        <h2 id="display">Convert one currency to another</h2>
+        <p id="rate">Conversions you make will be saved for offline use!</p>
         <div id="main">
           <form action="#">
             <label for="from">From: </label>
             <br>
-            <select id="from">
+            <select id="from" title="Select the currency to be converted from.">
             </select>
             <br>
             <label for="to">To: </label>
             <br>
-            <select id="to">
+            <select id="to" title="Select the currency to be converted to.">
             </select>
             <br>
             <label for="amount">Amount: </label>
             <br>
-            <input type="number" name="amount" id="amount" min="1" value="1" required>
+            <input type="number" step="any" name="amount" id="amount" min="1" value="1" title="Input the amount to be converted." required>
             <br>
-            <input type="submit" value="Convert">
+            <input type="submit" class="button" value="Convert">
           </form>
         </div>
       </section>
+      <div class="overlay">
+        <div id="loader">
+        </div>
+      </div>
+      <div class="overlay">
+        <div id="message">
+          <h1>Oops...</h1>
+          <p>This conversion can not yet be done offline.</p>
+          <small>Check your network connection!</small>
+          <button class="button">Close</button>
+        </div>
+      </div>
+      <div id="notification">
+        <p>There's an update available!</p>
+        <button class="button notif-btns">Refresh</button>
+        <button class="button notif-btns">Dismiss</button>
+      </div>
+      <footer>
+        <p>Created by <a href="https://clintonpi.github.io" target="_blank" rel="noopener">Clinton Nkwocha</a><br>Powered by <a href="https://www.currencyconverterapi.com" target="_blank" rel="noopener">Currency Converter API</a></p>
+      </footer>
     </div>
     <script src="./dist/js/script.js"></script>
   </body>
