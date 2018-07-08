@@ -23,15 +23,86 @@
     const from = document.querySelector('#from').value;
     const to = document.querySelector('#to').value;
     const query = `${from}_${to}`;
+    const display = document.querySelector('h2');
+    const amount = (Number(document.querySelector('#amount').value)).toFixed(3);
+    const rate = document.querySelector('#rate');
+    const overlayLoader = document.querySelectorAll('.overlay')[0].style;
+    let total;
+
+    overlayLoader.display = 'flex';
+    display.innerText = 'Convert from one currency to another';
+    rate.innerText = 'Conversions you make will be saved for offline use!';
+
+    if (from === to) {
+      overlayLoader.display = 'none';
+      total = amount;
+      display.innerText = `${amount} ${from} = ${total} ${to}`;
+      rate.innerText = "Let's be serious here please...";
+      return;
+    }
 
     fetch(`https://free.currencyconverterapi.com/api/v5/convert?q=${query}`)
       .then(convertion => convertion.json())
       .then((convertionData) => {
-        const convertionRate = convertionData.results[query].val;
-        const amount = document.querySelector('#amount').value;
-        const total = (amount * convertionRate).toFixed(2);
+        const convertionRate = (convertionData.results[query].val).toFixed(3);
 
-        document.querySelector('h2').innerText = `${amount} ${from} = ${total} ${to}`;
+        overlayLoader.display = 'none';
+        total = (amount * convertionRate).toFixed(3);
+        display.innerText = `${amount} ${from} = ${total} ${to}`;
+
+        if (amount !== '1.000' && from !== to) rate.innerText = `1 ${from} = ${convertionRate} ${to}`;
+      })
+      .catch(() => {
+        const overlayError = document.querySelectorAll('.overlay')[1];
+        overlayError.style.display = 'flex';
+        overlayError.addEventListener('click', () => {
+          overlayError.style.display = 'none';
+        });
+        overlayLoader.display = 'none';
       });
   });
+
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('./sw.js')
+      .then((reg) => {
+        // setup notifications to update sw
+        if (!navigator.serviceWorker.controller) return;
+
+        const notification = document.querySelector('#notification').style;
+        const notifBtns = document.querySelectorAll('.notif-btns');
+
+        const notify = (worker) => {
+          notification.display = 'block';
+          notifBtns.forEach((notifBtn) => {
+            notifBtn.addEventListener('click', (e) => {
+              if (e.target.innerText === 'Refresh') {
+                worker.postMessage({ action: 'skipWaiting' });
+              } else {
+                notification.display = 'none';
+              }
+            });
+          });
+        };
+
+        const trackInstalling = (worker) => {
+          worker.addEventListener('statechange', () => {
+            if (worker.state === 'installed') notify(worker);
+          });
+        };
+
+        if (reg.waiting) notify(reg.waiting);
+
+        if (reg.installing) trackInstalling(reg.installing);
+
+        reg.addEventListener('updatefound', () => {
+          trackInstalling(reg.installing);
+        });
+      });
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
+  }
 })();
