@@ -1,3 +1,5 @@
+import idb from 'idb';
+
 (() => {
   fetch('https://free.currencyconverterapi.com/api/v5/currencies')
     .then(currencyResp => currencyResp.json())
@@ -16,6 +18,10 @@
           });
         });
     });
+
+  const dbPromise = idb.open('cc-db', 1, (upgradeDb) => {
+    upgradeDb.createObjectStore('rates');
+  });
 
   document.querySelector('form').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -42,23 +48,52 @@
     }
 
     fetch(`https://free.currencyconverterapi.com/api/v5/convert?q=${query}`)
-      .then(convertion => convertion.json())
-      .then((convertionData) => {
-        const convertionRate = (convertionData.results[query].val).toFixed(3);
+      .then(conversion => conversion.json())
+      .then((conversionData) => {
+        const conversionRate = (conversionData.results[query].val).toFixed(3);
 
         overlayLoader.display = 'none';
-        total = (amount * convertionRate).toFixed(3);
+        total = (amount * conversionRate).toFixed(3);
         display.innerText = `${amount} ${from} = ${total} ${to}`;
 
-        if (amount !== '1.000' && from !== to) rate.innerText = `1 ${from} = ${convertionRate} ${to}`;
+        if (amount !== '1.000' && from !== to) rate.innerText = `1 ${from} = ${conversionRate} ${to}`;
+
+        // Add the fetched rate to indexDb
+        dbPromise
+          .then((db) => {
+            const tx = db.transaction('rates', 'readwrite');
+            const ratesStore = tx.objectStore('rates');
+            ratesStore.put(conversionRate, query);
+            return tx.complete;
+          });
       })
       .catch(() => {
-        const overlayError = document.querySelectorAll('.overlay')[1];
-        overlayError.style.display = 'flex';
-        overlayError.addEventListener('click', () => {
-          overlayError.style.display = 'none';
-        });
-        overlayLoader.display = 'none';
+        dbPromise
+          .then((db) => {
+            const tx = db.transaction('rates');
+            const ratesStore = tx.objectStore('rates');
+            return ratesStore.getAll(query);
+          })
+          .then((storedRate) => {
+            overlayLoader.display = 'none';
+
+            if (storedRate.length === 0) {
+              const overlayError = document.querySelectorAll('.overlay')[1];
+              overlayError.style.display = 'flex';
+              overlayError.addEventListener('click', () => {
+                overlayError.style.display = 'none';
+              });
+            } else {
+              total = (amount * storedRate.toString()).toFixed(3);
+              display.innerText = `${amount} ${from} = ${total} ${to}`;
+
+              if (amount !== '1.000' && from !== to) {
+                rate.innerText = `1 ${from} = ${storedRate.toFixed(3)} ${to}`;
+              } else {
+                rate.innerText = 'This conversion was done offline!';
+              }
+            }
+          });
       });
   });
 
