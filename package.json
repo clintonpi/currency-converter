@@ -4,7 +4,7 @@
   "description": "Currency Converter is a web application that help users convert one currency to another.",
   "main": "index.js",
   "scripts": {
-    "build": "babel app/js -d app/dist/js",
+    "build": "babel app/js -d app/dist/js && browserify app/dist/js/script.js -o app/dist/js/script.js",
     "clean": "rm -r app/dist && mkdir app/dist",
     "clean-build": "npm run clean && npm run build",
     "lint": "eslint ./ || true"
@@ -32,5 +32,9 @@
     "eslint": "^5.0.1",
     "eslint-config-airbnb-base": "^13.0.0",
     "eslint-plugin-import": "^2.13.0"
+  },
+  "dependencies": {
+    "browserify": "^16.2.2",
+    "idb": "^2.1.3"
   }
 }
