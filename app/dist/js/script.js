@@ -80,6 +80,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
         var ratesStore = tx.objectStore('rates');
         return ratesStore.getAll(query);
       }).then(function (storedRate) {
+        storedRate = storedRate.toString();
         overlayLoader.display = 'none';
 
         if (storedRate.length === 0) {
@@ -89,11 +90,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
             overlayError.style.display = 'none';
           });
         } else {
-          total = (amount * storedRate.toString()).toFixed(3);
+          total = (amount * storedRate).toFixed(3);
           display.innerText = amount + ' ' + from + ' = ' + total + ' ' + to;
 
           if (amount !== '1.000' && from !== to) {
-            rate.innerText = '1 ' + from + ' = ' + storedRate.toFixed(3) + ' ' + to;
+            rate.innerText = '1 ' + from + ' = ' + storedRate + ' ' + to;
           } else {
             rate.innerText = 'This conversion was done offline!';
           }
