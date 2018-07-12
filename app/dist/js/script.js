@@ -47,17 +47,29 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     var rate = document.querySelector('#rate');
     var overlayLoader = document.querySelectorAll('.overlay')[0].style;
     var time = -Date.now(); // To make time go backwards
-    var total = void 0;
 
-    overlayLoader.display = 'flex';
-    display.innerText = 'Convert from one currency to another';
-    rate.innerText = 'Conversions you make will be saved for offline use!';
+    var action = function action(_ref) {
+      var _ref$loaderDisplay = _ref.loaderDisplay,
+          loaderDisplay = _ref$loaderDisplay === undefined ? 'none' : _ref$loaderDisplay,
+          currentRate = _ref.currentRate,
+          _ref$total = _ref.total,
+          total = _ref$total === undefined ? (amount * currentRate).toFixed(3) : _ref$total,
+          _ref$displayText = _ref.displayText,
+          displayText = _ref$displayText === undefined ? amount + ' ' + from + ' = ' + total + ' ' + to : _ref$displayText,
+          _ref$rateText = _ref.rateText,
+          rateText = _ref$rateText === undefined ? 'Conversions you make will be saved for offline use!' : _ref$rateText;
+
+      overlayLoader.display = loaderDisplay;
+      display.innerText = displayText;
+      rate.innerText = rateText;
+
+      if (amount !== '1.000' && from !== to) rate.innerText = '1 ' + from + ' = ' + currentRate + ' ' + to;
+    };
+
+    action({ loaderDisplay: 'flex', displayText: 'Convert from one currency to another' });
 
     if (from === to) {
-      overlayLoader.display = 'none';
-      total = amount;
-      display.innerText = amount + ' ' + from + ' = ' + total + ' ' + to;
-      rate.innerText = "Let's be serious here please...";
+      action({ total: amount, rateText: "Let's be serious here please..." });
       return;
     }
 
@@ -66,11 +78,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     }).then(function (conversionData) {
       var conversionRate = conversionData.results[query].val.toFixed(3);
 
-      overlayLoader.display = 'none';
-      total = (amount * conversionRate).toFixed(3);
-      display.innerText = amount + ' ' + from + ' = ' + total + ' ' + to;
-
-      if (amount !== '1.000' && from !== to) rate.innerText = '1 ' + from + ' = ' + conversionRate + ' ' + to;
+      action({ currentRate: conversionRate });
 
       // Add the fetched rate to indexDb
       dbPromise.then(function (db) {
@@ -117,15 +125,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
         } else {
           var conversionRate = neededConversion.conversionRate;
 
-
-          total = (amount * conversionRate).toFixed(3);
-          display.innerText = amount + ' ' + from + ' = ' + total + ' ' + to;
-
-          if (amount !== '1.000' && from !== to) {
-            rate.innerText = '1 ' + from + ' = ' + conversionRate + ' ' + to;
-          } else {
-            rate.innerText = 'This conversion was done offline!';
-          }
+          action({ currentRate: conversionRate, rateText: 'This conversion was done offline!' });
         }
       });
     });

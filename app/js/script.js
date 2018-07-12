@@ -38,17 +38,25 @@ import idb from 'idb';
     const rate = document.querySelector('#rate');
     const overlayLoader = document.querySelectorAll('.overlay')[0].style;
     const time = -Date.now(); // To make time go backwards
-    let total;
 
-    overlayLoader.display = 'flex';
-    display.innerText = 'Convert from one currency to another';
-    rate.innerText = 'Conversions you make will be saved for offline use!';
+    const action = ({
+      loaderDisplay = 'none',
+      currentRate,
+      total = (amount * currentRate).toFixed(3),
+      displayText = `${amount} ${from} = ${total} ${to}`,
+      rateText = 'Conversions you make will be saved for offline use!'
+    }) => {
+      overlayLoader.display = loaderDisplay;
+      display.innerText = displayText;
+      rate.innerText = rateText;
+
+      if (amount !== '1.000' && from !== to) rate.innerText = `1 ${from} = ${currentRate} ${to}`;
+    };
+
+    action({ loaderDisplay: 'flex', displayText: 'Convert from one currency to another' });
 
     if (from === to) {
-      overlayLoader.display = 'none';
-      total = amount;
-      display.innerText = `${amount} ${from} = ${total} ${to}`;
-      rate.innerText = "Let's be serious here please...";
+      action({ total: amount, rateText: "Let's be serious here please..." });
       return;
     }
 
@@ -57,11 +65,7 @@ import idb from 'idb';
       .then((conversionData) => {
         const conversionRate = (conversionData.results[query].val).toFixed(3);
 
-        overlayLoader.display = 'none';
-        total = (amount * conversionRate).toFixed(3);
-        display.innerText = `${amount} ${from} = ${total} ${to}`;
-
-        if (amount !== '1.000' && from !== to) rate.innerText = `1 ${from} = ${conversionRate} ${to}`;
+        action({ currentRate: conversionRate });
 
         // Add the fetched rate to indexDb
         dbPromise
@@ -113,15 +117,7 @@ import idb from 'idb';
               });
             } else {
               const { conversionRate } = neededConversion;
-
-              total = (amount * conversionRate).toFixed(3);
-              display.innerText = `${amount} ${from} = ${total} ${to}`;
-
-              if (amount !== '1.000' && from !== to) {
-                rate.innerText = `1 ${from} = ${conversionRate} ${to}`;
-              } else {
-                rate.innerText = 'This conversion was done offline!';
-              }
+              action({ currentRate: conversionRate, rateText: 'This conversion was done offline!' });
             }
           });
       });
