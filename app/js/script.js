@@ -19,8 +19,12 @@ import idb from 'idb';
         });
     });
 
+  // Make keyPath query so that only the latest (update) of the query will be stored
+  // If keyPath is time queries will appear more than once.
+  // then index by time (which makes use of the already gotten query)
   const dbPromise = idb.open('cc-db', 1, (upgradeDb) => {
-    upgradeDb.createObjectStore('rates');
+    const rateStore = upgradeDb.createObjectStore('rates', { keyPath: 'query' });
+    rateStore.createIndex('by-time', 'time');
   });
 
   document.querySelector('form').addEventListener('submit', (e) => {
@@ -33,6 +37,7 @@ import idb from 'idb';
     const amount = (Number(document.querySelector('#amount').value)).toFixed(3);
     const rate = document.querySelector('#rate');
     const overlayLoader = document.querySelectorAll('.overlay')[0].style;
+    const time = -Date.now(); // To make time go backwards
     let total;
 
     overlayLoader.display = 'flex';
@@ -63,8 +68,27 @@ import idb from 'idb';
           .then((db) => {
             const tx = db.transaction('rates', 'readwrite');
             const ratesStore = tx.objectStore('rates');
-            ratesStore.put(conversionRate, query);
+            ratesStore.put({ query, conversionRate, time });
             return tx.complete;
+          });
+
+        dbPromise
+          .then((db) => {
+            const tx = db.transaction('rates', 'readwrite');
+            const ratesStore = tx.objectStore('rates');
+            const timeIndex = ratesStore.index('by-time');
+
+            return timeIndex.openCursor();
+            // Could have used "null, 'prev'" as arguments to go backwards if time wasn't negative
+          })
+          .then((cursor) => {
+            if (!cursor) return;
+            return cursor.advance(200);
+          })
+          .then(function deleteQuery(cursor) {
+            if (!cursor) return;
+            cursor.delete();
+            return cursor.continue().then(deleteQuery);
           });
       })
       .catch(() => {
@@ -72,24 +96,29 @@ import idb from 'idb';
           .then((db) => {
             const tx = db.transaction('rates');
             const ratesStore = tx.objectStore('rates');
-            return ratesStore.getAll(query);
+            const timeIndex = ratesStore.index('by-time');
+            return timeIndex.getAll();
           })
-          .then((storedRate) => {
-            storedRate = storedRate.toString();
+          .then((storedConversions) => {
+            const neededConversion = storedConversions
+              .filter(storedConversion => storedConversion.query === query)[0];
+
             overlayLoader.display = 'none';
 
-            if (storedRate.length === 0) {
+            if (!neededConversion) {
               const overlayError = document.querySelectorAll('.overlay')[1];
               overlayError.style.display = 'flex';
               overlayError.addEventListener('click', () => {
                 overlayError.style.display = 'none';
               });
             } else {
-              total = (amount * storedRate).toFixed(3);
+              const { conversionRate } = neededConversion;
+
+              total = (amount * conversionRate).toFixed(3);
               display.innerText = `${amount} ${from} = ${total} ${to}`;
 
               if (amount !== '1.000' && from !== to) {
-                rate.innerText = `1 ${from} = ${storedRate} ${to}`;
+                rate.innerText = `1 ${from} = ${conversionRate} ${to}`;
               } else {
                 rate.innerText = 'This conversion was done offline!';
               }

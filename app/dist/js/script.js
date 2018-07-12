@@ -28,8 +28,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     });
   });
 
+  // Make keyPath query so that only the latest (update) of the query will be stored
+  // If keyPath is time queries will appear more than once.
+  // then index by time (which makes use of the already gotten query)
   var dbPromise = _idb2.default.open('cc-db', 1, function (upgradeDb) {
-    upgradeDb.createObjectStore('rates');
+    var rateStore = upgradeDb.createObjectStore('rates', { keyPath: 'query' });
+    rateStore.createIndex('by-time', 'time');
   });
 
   document.querySelector('form').addEventListener('submit', function (e) {
@@ -42,6 +46,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     var amount = Number(document.querySelector('#amount').value).toFixed(3);
     var rate = document.querySelector('#rate');
     var overlayLoader = document.querySelectorAll('.overlay')[0].style;
+    var time = -Date.now(); // To make time go backwards
     var total = void 0;
 
     overlayLoader.display = 'flex';
@@ -71,30 +76,53 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
       dbPromise.then(function (db) {
         var tx = db.transaction('rates', 'readwrite');
         var ratesStore = tx.objectStore('rates');
-        ratesStore.put(conversionRate, query);
+        ratesStore.put({ query: query, conversionRate: conversionRate, time: time });
         return tx.complete;
+      });
+
+      dbPromise.then(function (db) {
+        var tx = db.transaction('rates', 'readwrite');
+        var ratesStore = tx.objectStore('rates');
+        var timeIndex = ratesStore.index('by-time');
+
+        return timeIndex.openCursor();
+        // Could have used "null, 'prev'" as arguments to go backwards if time wasn't negative
+      }).then(function (cursor) {
+        if (!cursor) return;
+        return cursor.advance(200);
+      }).then(function deleteQuery(cursor) {
+        if (!cursor) return;
+        cursor.delete();
+        return cursor.continue().then(deleteQuery);
       });
     }).catch(function () {
       dbPromise.then(function (db) {
         var tx = db.transaction('rates');
         var ratesStore = tx.objectStore('rates');
-        return ratesStore.getAll(query);
-      }).then(function (storedRate) {
-        storedRate = storedRate.toString();
+        var timeIndex = ratesStore.index('by-time');
+        return timeIndex.getAll();
+      }).then(function (storedConversions) {
+        var neededConversion = storedConversions.filter(function (storedConversion) {
+          return storedConversion.query === query;
+        })[0];
+
         overlayLoader.display = 'none';
 
-        if (storedRate.length === 0) {
+        if (!neededConversion) {
           var overlayError = document.querySelectorAll('.overlay')[1];
           overlayError.style.display = 'flex';
           overlayError.addEventListener('click', function () {
             overlayError.style.display = 'none';
           });
         } else {
-          total = (amount * storedRate).toFixed(3);
+          var conversionRate = neededConversion.conversionRate;
+
+
+          total = (amount * conversionRate).toFixed(3);
           display.innerText = amount + ' ' + from + ' = ' + total + ' ' + to;
 
           if (amount !== '1.000' && from !== to) {
-            rate.innerText = '1 ' + from + ' = ' + storedRate + ' ' + to;
+            rate.innerText = '1 ' + from + ' = ' + conversionRate + ' ' + to;
           } else {
             rate.innerText = 'This conversion was done offline!';
           }
