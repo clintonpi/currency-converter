@@ -63,7 +63,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
       display.innerText = displayText;
       rate.innerText = rateText;
 
-      if (amount !== '1.000' && from !== to) rate.innerText = '1 ' + from + ' = ' + currentRate + ' ' + to;
+      if (amount !== '1.000' && from !== to && currentRate) rate.innerText = '1 ' + from + ' = ' + currentRate + ' ' + to;
     };
 
     action({ loaderDisplay: 'flex', displayText: 'Convert from one currency to another' });
