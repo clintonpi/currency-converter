@@ -1,10 +1,10 @@
-const staticCacheName = 'cc-v2';
+const staticCacheName = 'cc-v3';
 
 self.addEventListener('install', (event) => {
   const urlsToCache = [
     './',
+    './?hs=true',
     './index.html',
-    './index.html?hs=true',
     './css/reset.min.css',
     './css/style.css',
     './images/favicon.ico',
