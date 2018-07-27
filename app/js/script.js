@@ -53,7 +53,7 @@ import idb from 'idb';
       if (amount !== '1.000' && from !== to && currentRate) rate.innerText = `1 ${from} = ${currentRate} ${to}`;
     };
 
-    action({ loaderDisplay: 'flex', displayText: 'Convert from one currency to another' });
+    action({ loaderDisplay: 'flex', displayText: 'Convert one currency to another' });
 
     if (from === to) {
       action({ total: amount, rateText: "Let's be serious here please..." });
