@@ -23,7 +23,7 @@ It makes use of the JavaScript [fetch API](https://developer.mozilla.org/en-US/d
 
 ## HOSTED APP
 
-The hosted app can be visited [here](https://clintonpi.github.io/currency-converter).
+The hosted app can be visited [here](https://clintonpi.github.io/currency-converter/).
 
 ## LICENSE
 
