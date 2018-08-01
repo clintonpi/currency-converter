@@ -3,6 +3,7 @@
   --primary: #40739e;
   --secondary: #535c68;
   --major: #ffffff;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -101,7 +102,10 @@ select {
   position: fixed;
   top: 0;
   background-color: rgba(0, 0, 0, .7);
-  display: none;
+  display: flex;
+  visibility: hidden;
+  opacity: 0;
+  transition: .5s;
 }
 
 #loader {
@@ -126,6 +130,9 @@ select {
   margin: auto;
   padding: 20px 10px;
   border-radius: 10px;
+  transform: scale(0);
+  transition: .2s;
+  transition-delay: .2s;
 }
 
 #message *:not(.button) {
@@ -207,7 +214,7 @@ footer a:hover {
 
 }
 
-@media (max-height: 600px) {
+@media (max-height: 700px) {
 
   footer {
     position: static;
