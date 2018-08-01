@@ -1,4 +1,4 @@
-const staticCacheName = 'cc-v3';
+const staticCacheName = 'cc-v4';
 
 self.addEventListener('install', (event) => {
   const urlsToCache = [
