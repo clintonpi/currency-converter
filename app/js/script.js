@@ -33,27 +33,30 @@ import idb from 'idb';
     const from = document.querySelector('#from').value;
     const to = document.querySelector('#to').value;
     const query = `${from}_${to}`;
-    const display = document.querySelector('h2');
     const amount = (Number(document.querySelector('#amount').value)).toFixed(3);
-    const rate = document.querySelector('#rate');
     const overlayLoader = document.querySelectorAll('.overlay')[0].style;
-    const time = -Date.now(); // To make time go backwards
 
     const action = ({
-      loaderDisplay = 'none',
+      loaderVisibility = 'hidden',
+      loaderOpacity = 0,
       currentRate,
       total = (amount * currentRate).toFixed(3),
       displayText = `${amount} ${from} = ${total} ${to}`,
       rateText = 'Conversions you make will be saved for offline use!'
     }) => {
-      overlayLoader.display = loaderDisplay;
+      const display = document.querySelector('h2');
+      const rate = document.querySelector('#rate');
+
+      overlayLoader.visibility = loaderVisibility;
+      overlayLoader.opacity = loaderOpacity;
       display.innerText = displayText;
       rate.innerText = rateText;
+      window.scroll(0, -window.pageYOffset);
 
       if (amount !== '1.000' && from !== to && currentRate) rate.innerText = `1 ${from} = ${currentRate} ${to}`;
     };
 
-    action({ loaderDisplay: 'flex', displayText: 'Convert one currency to another' });
+    action({ loaderVisibility: 'visible', loaderOpacity: 1, displayText: 'Convert one currency to another' });
 
     if (from === to) {
       action({ total: amount, rateText: "Let's be serious here please..." });
@@ -72,6 +75,7 @@ import idb from 'idb';
           .then((db) => {
             const tx = db.transaction('rates', 'readwrite');
             const ratesStore = tx.objectStore('rates');
+            const time = -Date.now(); // To make time go backwards
             ratesStore.put({ query, conversionRate, time });
             return tx.complete;
           });
@@ -107,13 +111,23 @@ import idb from 'idb';
             const neededConversion = storedConversions
               .filter(storedConversion => storedConversion.query === query)[0];
 
-            overlayLoader.display = 'none';
+            overlayLoader.visibility = 'hidden';
+            overlayLoader.opacity = 0;
 
             if (!neededConversion) {
               const overlayError = document.querySelectorAll('.overlay')[1];
-              overlayError.style.display = 'flex';
+
+              const toggleError = ((visibility, switcher) => {
+                const message = document.querySelector('#message').style;
+                overlayError.style.visibility = visibility;
+                overlayError.style.opacity = switcher;
+                message.transform = `scale(${switcher})`;
+              });
+
+              toggleError('visible', 1);
+
               overlayError.addEventListener('click', () => {
-                overlayError.style.display = 'none';
+                toggleError('hidden', 0);
               });
             } else {
               const { conversionRate } = neededConversion;

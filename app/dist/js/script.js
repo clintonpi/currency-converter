@@ -42,15 +42,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     var from = document.querySelector('#from').value;
     var to = document.querySelector('#to').value;
     var query = from + '_' + to;
-    var display = document.querySelector('h2');
     var amount = Number(document.querySelector('#amount').value).toFixed(3);
-    var rate = document.querySelector('#rate');
     var overlayLoader = document.querySelectorAll('.overlay')[0].style;
-    var time = -Date.now(); // To make time go backwards
 
     var action = function action(_ref) {
-      var _ref$loaderDisplay = _ref.loaderDisplay,
-          loaderDisplay = _ref$loaderDisplay === undefined ? 'none' : _ref$loaderDisplay,
+      var _ref$loaderVisibility = _ref.loaderVisibility,
+          loaderVisibility = _ref$loaderVisibility === undefined ? 'hidden' : _ref$loaderVisibility,
+          _ref$loaderOpacity = _ref.loaderOpacity,
+          loaderOpacity = _ref$loaderOpacity === undefined ? 0 : _ref$loaderOpacity,
           currentRate = _ref.currentRate,
           _ref$total = _ref.total,
           total = _ref$total === undefined ? (amount * currentRate).toFixed(3) : _ref$total,
@@ -59,14 +58,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
           _ref$rateText = _ref.rateText,
           rateText = _ref$rateText === undefined ? 'Conversions you make will be saved for offline use!' : _ref$rateText;
 
-      overlayLoader.display = loaderDisplay;
+      var display = document.querySelector('h2');
+      var rate = document.querySelector('#rate');
+
+      overlayLoader.visibility = loaderVisibility;
+      overlayLoader.opacity = loaderOpacity;
       display.innerText = displayText;
       rate.innerText = rateText;
+      window.scroll(0, -window.pageYOffset);
 
       if (amount !== '1.000' && from !== to && currentRate) rate.innerText = '1 ' + from + ' = ' + currentRate + ' ' + to;
     };
 
-    action({ loaderDisplay: 'flex', displayText: 'Convert one currency to another' });
+    action({ loaderVisibility: 'visible', loaderOpacity: 1, displayText: 'Convert one currency to another' });
 
     if (from === to) {
       action({ total: amount, rateText: "Let's be serious here please..." });
@@ -84,6 +88,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
       dbPromise.then(function (db) {
         var tx = db.transaction('rates', 'readwrite');
         var ratesStore = tx.objectStore('rates');
+        var time = -Date.now(); // To make time go backwards
         ratesStore.put({ query: query, conversionRate: conversionRate, time: time });
         return tx.complete;
       });
@@ -114,13 +119,23 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
           return storedConversion.query === query;
         })[0];
 
-        overlayLoader.display = 'none';
+        overlayLoader.visibility = 'hidden';
+        overlayLoader.opacity = 0;
 
         if (!neededConversion) {
           var overlayError = document.querySelectorAll('.overlay')[1];
-          overlayError.style.display = 'flex';
+
+          var toggleError = function toggleError(visibility, switcher) {
+            var message = document.querySelector('#message').style;
+            overlayError.style.visibility = visibility;
+            overlayError.style.opacity = switcher;
+            message.transform = 'scale(' + switcher + ')';
+          };
+
+          toggleError('visible', 1);
+
           overlayError.addEventListener('click', function () {
-            overlayError.style.display = 'none';
+            toggleError('hidden', 0);
           });
         } else {
           var conversionRate = neededConversion.conversionRate;
