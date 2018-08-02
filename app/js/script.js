@@ -51,7 +51,7 @@ import idb from 'idb';
       overlayLoader.opacity = loaderOpacity;
       display.innerText = displayText;
       rate.innerText = rateText;
-      window.scroll(0, -window.pageYOffset);
+      window.scroll(0, 0);
 
       if (amount !== '1.000' && from !== to && currentRate) rate.innerText = `1 ${from} = ${currentRate} ${to}`;
     };
