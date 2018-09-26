@@ -80,7 +80,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     fetch('https://free.currencyconverterapi.com/api/v5/convert?q=' + query).then(function (conversion) {
       return conversion.json();
     }).then(function (conversionData) {
-      var conversionRate = conversionData.results[query].val.toFixed(3);
+      var conversionRate = conversionData.results[query].val;
 
       action({ currentRate: conversionRate });
 

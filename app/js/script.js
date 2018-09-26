@@ -66,7 +66,7 @@ import idb from 'idb';
     fetch(`https://free.currencyconverterapi.com/api/v5/convert?q=${query}`)
       .then(conversion => conversion.json())
       .then((conversionData) => {
-        const conversionRate = (conversionData.results[query].val).toFixed(3);
+        const conversionRate = conversionData.results[query].val;
 
         action({ currentRate: conversionRate });
 
