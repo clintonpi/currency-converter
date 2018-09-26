@@ -14,8 +14,6 @@ These features include:
 ## DEPENDENCIES
 
 - [idb](https://www.npmjs.com/package/idb)
-- [Browserify](http://browserify.org/)
-- [Babel](https://babeljs.io/)
 
 ## OTHER INFORMATION
 

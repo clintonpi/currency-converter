@@ -26,14 +26,14 @@
   },
   "homepage": "https://github.com/clintonpi/currency-converter#readme",
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "browserify": "^16.2.2",
     "eslint": "^5.0.1",
     "eslint-config-airbnb-base": "^13.0.0",
     "eslint-plugin-import": "^2.13.0"
   },
   "dependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "browserify": "^16.2.2",
     "idb": "^2.1.3"
   }
 }
