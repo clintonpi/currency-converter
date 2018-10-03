@@ -1,12 +1,10 @@
-const staticCacheName = 'cc-v4';
+const staticCacheName = 'cc-v5';
 
 self.addEventListener('install', (event) => {
   const urlsToCache = [
     './',
     './?hs=true',
     './index.html',
-    './css/reset.min.css',
-    './css/style.css',
     './images/favicon.ico',
     './images/apple-60.png',
     './images/apple-76.png',
@@ -23,7 +21,8 @@ self.addEventListener('install', (event) => {
     './images/icon-384.png',
     './images/icon-512.png',
     './images/select-icon.png',
-    './dist/js/script.js',
+    './js/script.bundle.js',
+    './js/script.bundle.js.map',
     './manifest.json',
     'https://fonts.googleapis.com/css?family=Signika',
     'https://free.currencyconverterapi.com/api/v5/currencies'
