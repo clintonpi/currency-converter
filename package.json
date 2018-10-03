@@ -4,9 +4,8 @@
   "description": "Currency Converter is a web application that help users convert one currency to another.",
   "main": "index.js",
   "scripts": {
-    "build": "babel app/js -d app/dist/js && browserify app/dist/js/script.js -o app/dist/js/script.js",
-    "clean": "rm -r app/dist && mkdir app/dist",
-    "clean-build": "npm run clean && npm run build",
+    "build": "rm -rf dist && webpack --mode production --config webpack.config.js --progress --colors",
+    "dev": "rm -rf dist && webpack-dev-server -d --hot --config webpack.config.js --watch",
     "lint": "eslint ./ || true"
   },
   "repository": {
@@ -26,12 +25,25 @@
   },
   "homepage": "https://github.com/clintonpi/currency-converter#readme",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "browserify": "^16.2.2",
+    "autoprefixer": "9.1.5",
+    "babel-core": "6.26.3",
+    "babel-loader": "7.1.5",
+    "babel-preset-env": "1.7.0",
+    "copy-webpack-plugin": "^4.5.2",
+    "css-loader": "1.0.0",
     "eslint": "^5.0.1",
     "eslint-config-airbnb-base": "^13.0.0",
-    "eslint-plugin-import": "^2.13.0"
+    "eslint-plugin-import": "^2.13.0",
+    "file-loader": "2.0.0",
+    "html-minifier": "3.5.20",
+    "html-minifier-loader": "1.4.1",
+    "imagemin-webpack-plugin": "2.3.0",
+    "postcss-loader": "3.0.0",
+    "style-loader": "0.23.0",
+    "uglifyjs-webpack-plugin": "2.0.1",
+    "webpack": "4.20.2",
+    "webpack-cli": "3.1.2",
+    "webpack-dev-server": "3.1.9"
   },
   "dependencies": {
     "idb": "^2.1.3"
