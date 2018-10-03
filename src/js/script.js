@@ -1,4 +1,22 @@
 import idb from 'idb';
+import '../index.html';
+import '../css/reset.min.css';
+import '../css/style.css';
+import '../images/apple-60.png';
+import '../images/apple-76.png';
+import '../images/apple-120.png';
+import '../images/apple-152.png';
+import '../images/apple-167.png';
+import '../images/apple-180.png';
+import '../images/favicon.ico';
+import '../images/icon-48.png';
+import '../images/icon-96.png';
+import '../images/icon-128.png';
+import '../images/icon-144.png';
+import '../images/icon-192.png';
+import '../images/icon-256.png';
+import '../images/icon-384.png';
+import '../images/icon-512.png';
 
 (() => {
   fetch('https://free.currencyconverterapi.com/api/v5/currencies')
